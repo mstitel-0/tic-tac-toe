@@ -1,7 +1,7 @@
-# cd onedrive/робочий стіл/tic-tac-toe
-from game import TicTacToe
-import os
 import msvcrt
+import os
+
+from game import TicTacToe
 
 
 class TicTacToeGame:
@@ -11,23 +11,20 @@ class TicTacToeGame:
         self.grid_size = 0
         self.game = None
         self.active_cell = (0, 0)
+        self.current_player_index = 0
 
     def start_game(self):
         print("Welcome to Tic-Tac-Toe!")
-
         self.get_players_info()
         self.get_grid_size()
-
         self.game = TicTacToe(self.num_players, self.player_names, self.grid_size)
         self.play_game()
 
     def display_board(self):
         os.system('cls' if os.name == 'nt' else 'clear')  # Clear the screen
-
         board = self.game.board
         cell_width = 5  # Width of each cell (including borders and spaces)
         row_separator = "+".join(["-" * cell_width for _ in range(self.grid_size)])
-
         for i in range(self.grid_size):
             print("|", end="")  # Start each row with "|"
             for j in range(self.grid_size):
@@ -97,10 +94,14 @@ class TicTacToeGame:
             elif result == 'draw':
                 print("It's a draw!")
                 break
+            elif result == 'success':
+                print("Move successful.")
+
 
     def get_player_move(self):
         while True:
             self.display_board()  # Display the board with the current active cell highlighted
+            print(f"It's {self.player_names[self.current_player_index]}'s turn.")
             print("Use arrow keys to navigate, then press Enter to select.")
 
             row, col = self.handle_arrow_input()  # Get the selected cell using arrow keys
@@ -113,6 +114,8 @@ class TicTacToeGame:
             elif result == 'draw':
                 print("It's a draw!")
                 break
+
+            self.current_player_index = (self.current_player_index + 1) % self.num_players  # Switch to the next player
 
         return row, col
 
