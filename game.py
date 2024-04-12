@@ -1,5 +1,8 @@
 import random
 
+
+import random
+
 class TicTacToe:
     def __init__(self, num_players, player_names, grid_size, player_symbols=None):
         if num_players < 2:
@@ -32,10 +35,6 @@ class TicTacToe:
     def make_move(self, row, col):
         if self.board[row][col] != '':
             return 'occupied', None, []
-
-        # Check if it's the correct player's turn
-        if self.current_player != self.player_names[self.current_player_index]:
-            return 'wrong_turn', None, []
 
         self.board[row][col] = self.player_symbols[self.current_player]  # Use player symbol for the current player
         self.moves_left -= 1
