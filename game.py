@@ -195,3 +195,6 @@ class TicTacToe:
             return winning_cells
 
         return []
+    def clear_board(self):
+        self.board = [['' for _ in range(self.grid_size)] for _ in range(self.grid_size)]
+        self.moves_left = self.grid_size * self.grid_size

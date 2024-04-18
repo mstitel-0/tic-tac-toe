@@ -1,5 +1,6 @@
 import os
 import sys
+import random
 
 from game import TicTacToe
 
@@ -21,12 +22,12 @@ class TicTacToeGame:
         self.play_game()
 
     def display_board(self):
-        os.system('cls' if os.name == 'nt' else 'clear')  # Clear the screen
+        os.system('cls' if os.name == 'nt' else 'clear')
         board = self.game.board
-        cell_width = 5  # Width of each cell (including borders and spaces)
+        cell_width = 5
         row_separator = "+".join(["-" * cell_width for _ in range(self.grid_size)])
         for i in range(self.grid_size):
-            print("|", end="")  # Start each row with "|"
+            print("|", end="")
             for j in range(self.grid_size):
                 cell_content = f"[{board[i][j]:^3}]" if (i, j) != self.active_cell else f"[*{board[i][j]}*]"
                 print(cell_content, end="")
@@ -36,25 +37,26 @@ class TicTacToeGame:
             if i != self.grid_size - 1:
                 print("+" + row_separator)
         print()
+        print(f"It's {self.player_names[self.current_player_index]}'s turn.")
 
     def handle_arrow_input(self):
         while True:
             try:
                 import msvcrt
-                key = ord(msvcrt.getch())  # Get the ASCII value of the pressed key
-                if key == 224:  # Arrow key is pressed
-                    arrow_key = ord(msvcrt.getch())  # Get the second byte of arrow key input
-                    if arrow_key == 72:  # Up arrow
+                key = ord(msvcrt.getch())
+                if key == 224:
+                    arrow_key = ord(msvcrt.getch())
+                    if arrow_key == 72:
                         self.active_cell = (max(self.active_cell[0] - 1, 0), self.active_cell[1])
-                    elif arrow_key == 80:  # Down arrow
+                    elif arrow_key == 80:
                         self.active_cell = (min(self.active_cell[0] + 1, self.grid_size - 1), self.active_cell[1])
-                    elif arrow_key == 75:  # Left arrow
+                    elif arrow_key == 75:
                         self.active_cell = (self.active_cell[0], max(self.active_cell[1] - 1, 0))
-                    elif arrow_key == 77:  # Right arrow
+                    elif arrow_key == 77:
                         self.active_cell = (self.active_cell[0], min(self.active_cell[1] + 1, self.grid_size - 1))
-                    self.display_board()  # Update the board display with the new active cell
-                elif key == 13:  # Enter key
-                    return self.active_cell  # Return the selected cell when Enter is pressed
+                    self.display_board()
+                elif key == 13:
+                    return self.active_cell
             except ImportError:
                 print("Arrow key input is not supported on this platform.")
                 sys.exit(1)
@@ -89,52 +91,31 @@ class TicTacToeGame:
         while True:
             self.display_board()
 
-            while True:  # Loop for invalid moves or quitting
+            while True:
                 try:
-                    move = self.get_player_move()
-                    if move is None:
-                        break
-                    row, col = move
+                    row, col = self.handle_arrow_input()
+                    result, winner, _ = self.game.make_move(row, col)
                     break
                 except ValueError:
                     print("Invalid move! Please enter row and column numbers separated by a space (e.g., 1 2).")
 
-                # Now you can use row and col (assuming they were assigned correctly)
-            result, winner, _ = self.game.make_move(row, col)
-
             if result == 'win':
+                self.display_board()
                 print(f"Congratulations! {winner} wins!")
                 play_again = input("Play Again? (y/n): ")
                 if play_again.lower() != 'y':
                     break
+                else:
+                    self.game.clear_board()
+                    self.current_player_index = 0
+                    self.active_cell = (0, 0)
             elif result == 'draw':
                 print("It's a draw!")
                 play_again = input("Play Again? (y/n): ")
                 if play_again.lower() != 'y':
                     break
             elif result == 'success':
-                print("Move successful.")
-
-
-    def get_player_move(self):
-        while True:
-            self.display_board()
-            print(f"It's {self.player_names[self.current_player_index]}'s turn.")
-            print("Use arrow keys to navigate, then press Enter to select.")
-
-            row, col = self.handle_arrow_input()
-
-            result, winner, _ = self.game.make_move(row, col)
-
-            if result == 'win':
-                return print(f"Congratulations! {winner} wins!")
-            elif result == 'draw':
-                print("It's a draw!")
-                break
-
-            self.current_player_index = (self.current_player_index + 1) % self.num_players  # Switch to the next player
-
-        return row, col
+                self.current_player_index = (self.current_player_index + 1) % self.num_players
 
 
 if __name__ == "__main__":
